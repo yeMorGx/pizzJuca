@@ -1,57 +1,71 @@
 <?php
 
-class Bebidas {
- 
+/**
+ * =========================================================================
+ * O QUE É ESTE FICHEIRO? (bem simples)
+ * =========================================================================
+ * Igual à ideia do Pizza.php, mas para a tabela `bebidas`. É o "tradutor" entre
+ * o PHP e as linhas da base de dados: ler lista, ler uma, criar, atualizar, apagar.
+ *
+ * A classe chama-se Bebidas (plural) mas cada objeto representa uma bebida / registo.
+ */
+
+class Bebidas
+{
     private $conn;
     private $tabela = "bebidas";
+
     public $idBebidas;
     public $nome;
     public $litros;
     public $valor;
- 
-    public function __construct($db) {
+
+    public function __construct($db)
+    {
         $this->conn = $db;
     }
 
-    // método para obter todas as pizzas do banco de dados
-    public function getall(){
-
-        // consulta SQL para selecionar os campos idPizza, nome, ingredientes e valor da tabela de pizzas
-        $query ="SELECT idBebidas, nome, litros, valor FROM " . $this->tabela;
-        // prepara a consulta SQL usando a conexão com o banco de dados e executa a consulta, retornando o resultado
+    /**
+     * Lista todas as bebidas da tabela. Devolve o resultado PDO para o getall.php percorrer.
+     */
+    public function getall()
+    {
+        $query = "SELECT idBebidas, nome, litros, valor FROM " . $this->tabela;
         $stmt = $this->conn->prepare($query);
-        // executa a consulta SQL preparada
         $stmt->execute();
-        // retorna o resultado da consulta SQL, que é um objeto PDOStatement contendo as linhas selecionadas da tabela de pizzas
         return $stmt;
     }
 
-// método para obter uma pizza específica do banco de dados com base no idPizza
-public function get() {
-    $query = "SELECT idBebidas, nome, litros, valor 
-    FROM " . $this->tabela . " 
-    WHERE idBebidas = ? 
-    LIMIT 1";
+    /**
+     * Uma bebida pelo id em $this->idBebidas. Preenche o objeto se existir; senão devolve false.
+     */
+    public function get()
+    {
+        $query = "SELECT idBebidas, nome, litros, valor
+            FROM " . $this->tabela . "
+            WHERE idBebidas = ?
+            LIMIT 1";
 
-    // prepara a consulta SQL usando a conexão com o banco de dados, vinculando o parâmetro idPizza à consulta, executando a consulta e retornando a linha resultante como um array associativo
-    $stmt = $this->conn->prepare($query);
-    // vincula o valor da propriedade idPizza ao primeiro parâmetro da consulta SQL usando o método bindParam, que é uma forma segura de passar valores para a consulta e evitar ataques de injeção de SQL
-    $stmt->bindParam(1, $this->idBebidas);
-    // executa a consulta SQL preparada
-    $stmt->execute();
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $this->idBebidas);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($row) {
-        $this->idBebidas = $row['idBebidas'];
-        $this->nome = $row['nome'];
-        $this->litros = $row['litros'];
-        $this->valor = $row['valor'];
+        if ($row) {
+            $this->idBebidas = $row['idBebidas'];
+            $this->nome = $row['nome'];
+            $this->litros = $row['litros'];
+            $this->valor = $row['valor'];
+        }
+
+        return $row;
     }
 
-    return $row;
-}
-
-    public function create() {
+    /**
+     * Insere bebida nova; depois guarda o id gerado pelo MySQL em idBebidas.
+     */
+    public function create()
+    {
         $query = "INSERT INTO " . $this->tabela . " (nome, litros, valor) VALUES (:nome, :litros, :valor)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindValue(':nome', $this->nome);
@@ -64,7 +78,11 @@ public function get() {
         return true;
     }
 
-    public function update() {
+    /**
+     * Atualiza a linha com id = idBebidas. true se alterou alguma coisa.
+     */
+    public function update()
+    {
         $query = "UPDATE " . $this->tabela . "
             SET nome = :nome, litros = :litros, valor = :valor
             WHERE idBebidas = :id";
@@ -77,12 +95,15 @@ public function get() {
         return $stmt->rowCount() > 0;
     }
 
-    public function delete() {
-        $query = "DELETE FROM " . $this->tabela . " WHERE idBebidas = ? LIMIT 1";
+    public function delete()
+    {
+        $query = "DELETE FROM " . $this->tabela . " WHERE idBebidas = :id";
+
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->idBebidas);
+        $stmt->bindValue(':id', $this->idBebidas);
+
         $stmt->execute();
+
         return $stmt->rowCount() > 0;
     }
-
 }

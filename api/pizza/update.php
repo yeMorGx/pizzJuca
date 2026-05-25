@@ -1,4 +1,15 @@
 <?php
+/**
+ * =========================================================================
+ * O QUE FAZ ISTO? (bem simples)
+ * =========================================================================
+ * ATUALIZAR = a pizza JÁ existe; vamos mudar nome/ingredientes/valor.
+ * O JSON tem de trazer o "id" para sabermos QUAL linha alterar na tabela.
+ *
+ * Usamos PUT porque é o verbo que a maioria das APIs usa para "substituir/atualizar"
+ * um recurso que já tem endereço (identificado pelo id).
+ */
+
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: PUT, OPTIONS");
@@ -49,6 +60,7 @@ if ($pizza->update()) {
         "valor" => (float) $pizza->valor,
     ]);
 } else {
+    // Ou não existia esse id, ou os dados eram iguais aos que já estavam (0 linhas afetadas).
     http_response_code(404);
     echo json_encode(["message" => "Pizza não encontrada ou dados iguais aos atuais."]);
 }

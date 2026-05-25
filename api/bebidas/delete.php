@@ -1,4 +1,5 @@
 <?php
+
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: DELETE, OPTIONS");
@@ -18,15 +19,20 @@ if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
 include_once '../../config/Database.php';
 include_once '../../models/Bebidas.php';
 
-$id = isset($_GET['id']) ? $_GET['id'] : null;
-if (!$id) {
+$data = json_decode(file_get_contents("php://input"));
+
+// validação única e correta
+if (!isset($data->idBebidas) || !is_numeric($data->idBebidas)) {
     http_response_code(400);
-    echo json_encode(["message" => "Parâmetro id é obrigatório."]);
+    echo json_encode(["message" => "Id inválido ou não enviado."]);
     exit;
 }
 
+$id = (int) $data->idBebidas;
+
 $database = new Database();
 $db = $database->getConnection();
+
 if (!$db) {
     http_response_code(500);
     echo json_encode(["message" => "Erro de conexão com o banco."]);
@@ -37,9 +43,17 @@ $bebida = new Bebidas($db);
 $bebida->idBebidas = $id;
 
 if ($bebida->delete()) {
+
     http_response_code(200);
-    echo json_encode(["message" => "Bebida removida.", "id" => (int) $id]);
+    echo json_encode([
+        "message" => "Bebida deletada com sucesso.",
+        "id" => $id
+    ]);
+
 } else {
+
     http_response_code(404);
-    echo json_encode(["message" => "Bebida não encontrada."]);
+    echo json_encode([
+        "message" => "Bebida não encontrada."
+    ]);
 }

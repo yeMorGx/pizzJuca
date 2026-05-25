@@ -1,4 +1,12 @@
 <?php
+/**
+ * =========================================================================
+ * O QUE FAZ ISTO? (bem simples)
+ * =========================================================================
+ * Atualiza uma bebida que já existe. O JSON tem de trazer id + nome + litros + valor.
+ * Mesma lógica do update de pizza.
+ */
+
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: PUT, OPTIONS");

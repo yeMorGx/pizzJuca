@@ -1,46 +1,58 @@
 <?php
-//CRIAÇÃO ROTA GET.PHP
-// Headers obrigatórios
+/**
+ * =========================================================================
+ * PRIMEIRO: lê isto se estiveres perdido
+ * =========================================================================
+ * O getall.php = "dá-me todas as bebidas".
+ * Este ficheiro = "dá-me UMA bebida" → tens de dizer qual com ?id= na URL.
+ * Exemplo: .../api/bebidas/get.php?id=2
+ *
+ * Sem id = não sabemos que linha ir buscar à tabela → erro 400 com mensagem clara.
+ */
+
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
- 
-// Incluir arquivos de banco de dados e modelo
+
 include_once '../../config/Database.php';
 include_once '../../models/Bebidas.php';
- 
-// Instanciar o objeto Database e obter a conexão
+
 $database = new Database();
 $db = $database->getConnection();
- 
-// Instanciar o objeto Pizza
+
 $bebidas = new Bebidas($db);
- 
-$bebidas->idBebidas = isset($_GET['id']) ? $_GET['id'] : null;
- 
+
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-    if ($bebidas->idBebidas) {
-        // Busca a pizza
-        $bebidas->get();
- 
-        // Cria o array de resposta
-            $bebida_arr = array(
-            "id" => $bebidas->idBebidas,
-            "nome" => $bebidas->nome,
-            "litros" => $bebidas->litros,
-            "valor" => $bebidas->valor
+
+    $idParam = isset($_GET['id']) ? trim((string) $_GET['id']) : '';
+
+    if ($idParam === '') {
+        http_response_code(400);
+        echo json_encode(
+            array("Mensagem" => "Id é obrigatório.")
         );
- 
-        // Converte para JSON e envia a resposta
-        // `JSON_PRETTY_PRINT` é opcional, mas deixa o JSON mais legível
-        echo json_encode($bebida_arr, JSON_PRETTY_PRINT);
     } else {
- 
- 
+        $bebidas->idBebidas = $idParam;
+        $row = $bebidas->get();
+
+        if (!$row) {
+            http_response_code(404);
+            echo json_encode(
+                array("Mensagem" => "Bebida não encontrada.")
+            );
+        } else {
+            http_response_code(200);
+            $bebida_arr = array(
+                "id" => $bebidas->idBebidas,
+                "nome" => $bebidas->nome,
+                "litros" => $bebidas->litros,
+                "valor" => $bebidas->valor
+            );
+            echo json_encode($bebida_arr, JSON_PRETTY_PRINT);
+        }
     }
-}else {
-     http_response_code(405);
+} else {
+    http_response_code(405);
     echo json_encode(
-            array("Mensagem" => "Método não permitido.")
-        );
+        array("Mensagem" => "Método não permitido.")
+    );
 }
- 

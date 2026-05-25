@@ -1,4 +1,12 @@
 <?php
+/**
+ * =========================================================================
+ * O QUE FAZ ISTO? (bem simples)
+ * =========================================================================
+ * Cria uma BEBIDA nova. O cliente manda JSON no corpo (POST) com nome, litros e valor.
+ * Igual à ideia do create de pizza; só mudam os campos da tabela.
+ */
+
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
