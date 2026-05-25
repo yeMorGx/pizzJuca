@@ -1,7 +1,26 @@
 <?php
+/**
+ * =========================================================================
+ * O QUE É UMA "MODEL" / MODELO? (bem simples)
+ * =========================================================================
+ * Este ficheiro é a "receita" da Pizza no código. Não é o ecrã do site; é a parte
+ * que sabe COMO ler e escrever pizzas na tabela `pizzas` do MySQL.
+ *
+ * Cada função abaixo faz UMA coisa óbvia:
+ *   getall   → traz todas as linhas da tabela (lista do cardápio).
+ *   get      → traz UMA linha, pela chave idPizza.
+ *   create   → insere uma linha nova.
+ *   update   → altera uma linha que já existe.
+ *   delete   → apaga uma linha.
+ *
+ * Porque prepare() e bind? Porque assim o valor do id/nome vai "encaixado" no sítio
+ * certo do comando SQL sem o utilizador mal-intencionado poder injetar comando falso
+ * (é a defesa básica contra SQL injection — não precisas de decorar, só saber que é boa prática).
+ */
 
-class Pizza {
- 
+class Pizza
+{
+    // Ligação ao MySQL (vem de fora, do Database.php).
     private $conn;
     private $tabela = "pizzas";
  
